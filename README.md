@@ -23,15 +23,88 @@
 
 
 # Spring的組成
+
 七大模塊
-0. Spring Core
-   + Bean Cointainer
+
+0. Spring Core (萬物之源)
+   + Bean Container
 1. Spring AoP
 2. Spring ORM
-3. Spring Dao
+   + Hibernate Support
+3. Spring DAO
 4. Spring Web
+   + WebApplicationContext
 5. Spring Context
-6. Spring Web MvC
+   + Application
+6. Spring MVC
+
+
+# 弊端
+
+> 發展了太久之後，違背了原來的理念，配置十分繁瑣，人稱配置地獄
+
+# IoC理論推導
+
+### 最初未使用IoC思想
+1. UserDao 介面
+```java
+public interface UserDao{
+   void getUser();
+}
+```
+2. UserDaoImpl 實現類
+``` java
+public class UserDaoImpl imlements UserDao{
+   public void getUser(){
+      System.out.println("預設");
+   }
+}
+```
+``` java
+public class UserDaoMySqlImpl imlements UserDao{
+   public void getUser(){
+      System.out.println("mySQL");
+   }
+}
+```
+``` java
+public class UserDaoOracalImpl imlements UserDao{
+   public void getUser(){
+      System.out.println("Oracle");
+   }
+}
+```
+3. UserService 業務介紹
+
+```java
+
+```
+
+4. UserServiceImpl 業務實現
+```java
+public class UserServiceImpl implements UserService{
+  private User userDao = new UserDaoImpl();
+
+  public void getUser(){
+   userDao.getUser();
+  }
+}
+```
+
+5. Main方法
+```java
+public class Mytest{
+   public static void main (String[] args){
+      //使用者實際是調用Service，DAO層不需要接觸。
+      UserServiceImpl userService = new userServiceImpl();
+
+      userService.getUser();
+      //印出「預設」
+   }
+}
+
+```
+
 
 
 
