@@ -9,12 +9,13 @@
 ---
 
 # 優點
+> 3.4.面試必問
 1. 免費的、開放原始碼的容器
 2. 輕量級的、非入侵式的框架
 3. 控制反轉 、切面導向
 4. 支持事務的處理，對框架整合的支持
 
-###### 3.4.面試必問
+
 
 
 總結出來就是: 
@@ -83,7 +84,7 @@ public class UserDaoOracalImpl imlements UserDao{
 4. UserServiceImpl 業務實現
 ```java
 public class UserServiceImpl implements UserService{
-  private User userDao = new UserDaoImpl();
+  private User userDao = new UserDaoOracalImpl();
 
   public void getUser(){
    userDao.getUser();
@@ -96,10 +97,92 @@ public class UserServiceImpl implements UserService{
 public class Mytest{
    public static void main (String[] args){
       //使用者實際是調用Service，DAO層不需要接觸。
-      UserServiceImpl userService = new userServiceImpl();
+      UserServiceImpl userService = new UserServiceImpl();
 
       userService.getUser();
-      //印出「預設」
+      /*印出「Oracle」
+      每一次用戶的需求改變(調用不同資料庫而需要去更動)
+      UserServiceImpl userService = new UserDaoOracalImpl();
+      很明顯的程式的耦合性太強，違反開放擴充，封閉修改的原則
+      程式無法適應用戶的需求變更
+      */
+
+   }
+}
+
+```
+
+### 使用IoC思想來設計程式
+
+1. UserDao 介面
+```java
+public interface UserDao{
+   void getUser();
+}
+```
+
+2. UserDaoImpl 實現類
+``` java
+public class UserDaoImpl imlements UserDao{
+   public void getUser(){
+      System.out.println("預設");
+   }
+}
+```
+``` java
+public class UserDaoMySqlImpl imlements UserDao{
+   public void getUser(){
+      System.out.println("mySQL");
+   }
+}
+```
+``` java
+public class UserDaoOracalImpl imlements UserDao{
+   public void getUser(){
+      System.out.println("Oracle");
+   }
+}
+```
+3. UserService 業務介紹
+
+```java
+
+```
+
+# 4. UserServiceImpl 業務實現 (這邊修改實例化物件)
+```java
+public class UserServiceImpl implements UserService{
+  private User userDao;
+  
+  //利用Set，進行動態實現值的注入
+  public void setUserDao(UserDao userDo){
+   this.userDao= userDao;
+  }
+
+  public void getUser(){
+   userDao.getUser();
+  }
+}
+```
+
+5. Main方法
+```java
+public class Mytest{
+   public static void main (String[] args){
+      //使用者實際是調用Service，DAO層不需要接觸。
+      UserService userService = new UserServiceImpl();
+      UserServiceImpl.setUserDao(UserDaoMySqlImpl);
+      //用set的方式去把值注入進去
+      userService.getUser();
+      //印出「mySQL」
+
+      UserServiceImpl.setUserDao(UserDaoOracalImpl);
+      userService.getUser();
+      //印出「Oracle」
+
+      /*讓物件的創造與控制由工程師轉移到客戶，客戶需求更改，工程師不需要去後台變更程式碼
+      */
+      
    }
 }
 
