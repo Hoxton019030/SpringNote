@@ -280,13 +280,128 @@ public class Mytest {
 
    <bean id="UserServiceImpl" class="helloSpring.UserServiceImpl">
          <property name="userDao" ref="mySQLImpl"/>
-         <!-- 將UserServiceImpl裡面的userDao物件，讓它參考到mysqlImpl的Bean -->
+         <!-- 將UserServiceImpl裡面的userDao物件，讓它參考到name="mysqlImpl"的Bean -->
    </bean>
    
 </beans>
 ```
 
+# IoC創建物件的方式之一_調用無參建構子
+
+```xml
+<bean id="User" class="User.User">
+	<property name="name" value="許誌展"></property>
+	</bean>
+```
+
+```java
+
+package User;
+
+public class User {
+
+	private String name;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public User() {
+		System.out.println("User的無參建構子");
+	}
+
+	public void show() {
+		System.out.println("name" + name);
+	}
+
+}
+
+```
+
+```java
+public class MyTest {
+	public static void main(String[] args) {
+		ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+		User user = (User)context.getBean("User");
+		user.show();
+      //印出
+      //User的無參建構子
+      //name許誌展
+      /*
+      代表Spring所創建的對象其實是調用無參建構子，因此如果將無參建構子刪掉的話
+      則會報錯NoSuchMethodException
+      */
+	}
+}
+```
 
 
 
+# IoC創建物件的方式之二_調用有參建構子(Constructor Argument Resolution)
+
+## 1. 下標附值 (Constructor Argument Index)
+
+> 從 User.User裡面找到一個有一個參數的建構子，並將value注入近去
+```xml
+	<bean id="UserConstructor" class="User.User">
+	<constructor-arg index="0" value="許誌展">
+	</constructor-arg>
+	</bean>
+```
+
+```java
+package User;
+
+public class User {
+
+	private String name;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public User(String name) {
+		System.out.println("User的有參建構子");
+		System.out.println("name"+name);
+	}
+
+	public void show() {
+		System.out.println("name" + name);
+	}
+
+}
+```
+
+```java
+public class MyTest {
+	public static void main(String[] args) {
+		ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+		User userConstructor = (User)context.getBean("UserConstructor");
+      /*
+      印出 User的有參建構子
+      印出name許誌展
+      */
+	}
+}
+```
+
+
+## 2. 參數附值(Construtor Argument Type Matching) 不建議使用
+```xml
+	<bean id="UserArgumentConstructor" class="User.User">
+	<constructor-arg type="java.lang.String" value="許誌展">
+	</constructor-arg>
+	</bean>
+```
+```java
+   User userConstructor = (User)context.getBean("UserArgumentConstructor");
+```
 

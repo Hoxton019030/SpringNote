@@ -11,5 +11,19 @@
 	<bean id="hello123" class="Entity.Hello">
 		<property name="str" value="Spring"></property>
 	</bean>
+	
+	<bean id="User" class="User.User">
+	<property name="name" value="許誌展"></property>
+	</bean>
+	
+	<bean id="UserIndexConstructor" class="User.User">
+	<constructor-arg index="0" value="許誌展">
+	</constructor-arg>
+	</bean>
+	
+	<bean id="UserArgumentConstructor" class="User.User">
+	<constructor-arg type="java.lang.String" value="許誌展">
+	</constructor-arg>
+	</bean>
 
 </beans>
