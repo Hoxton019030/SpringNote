@@ -188,6 +188,17 @@ public class Mytest{
 
 ```
 
+未使用IoC之前，用戶的可能會影響我們原來的代碼，我們需要根據用戶的需求去修改原代碼!如果程式代碼量十大分，修改一次的成本代價十分昂貴
+
+```java
+private UserDao userDao;
+public void setUserDao(UserDao userDao){
+   this.userDao=userDao;
+}
+```
+
++ 之前是程序主動創造對象，現在控制權則是可以動態修改的
++ 使用set注入後，程序不在具有主動性，而是變成了被動的接受對象
 
 
 
