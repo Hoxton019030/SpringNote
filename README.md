@@ -394,7 +394,7 @@ public class MyTest {
 ```
 
 
-## 2. 參數附值(Construtor Argument Type Matching) 不建議使用
+## 2. 參數附值(Construtor Argument Type Matching) 不建議使用，因為如果有兩個一樣資料型別的就不能用
 ```xml
 	<bean id="UserArgumentConstructor" class="User.User">
 	<constructor-arg type="java.lang.String" value="許誌展">
@@ -403,5 +403,62 @@ public class MyTest {
 ```
 ```java
    User userConstructor = (User)context.getBean("UserArgumentConstructor");
+```
+
+## 3. 參數名附值 建議使用
+```xml
+<bean id="UserArgumentNameConstructor" class="User.User">
+	      <constructor-arg name="name" value="許誌展"/>
+</bean>
+```
+```java
+   User userConstructor = (User)context.getBean("UserArgumentNameConstructor");
+```
+
+
+總結:  在配置文件加載的時候，容器中管理的對象就已經初始化了。
+
+
+
+
+# Spring的配置
+
+1. 別名(alias)
+    ```xml
+	<bean id="UserArgumentConstructor" class="User.User">
+	<constructor-arg type="java.lang.String" value="許誌展">
+	</constructor-arg>
+	</bean>
+   <alias name="UserArgumentConstructor" alias="test"/>
+   ```
+   ```java
+   public class MyTest {
+	public static void main(String[] args) {
+		ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+		User userConstructor = (User)context.getBean("test");
+	  }
+   }
+   ```
+   
+2. Bean的配置
+   ```xml
+	<bean id="User" class="User.User" name="userNew" >
+	<constructor-arg index="0" value="許誌展">
+	</constructor-arg>
+	</bean>
+   ```
+   `id:bean的唯一識別符`
+
+   `class:bean物件所對應的全限定名 : packageName+Class`
+
+   `name: 也是別名,而且name可以取多個別名`
+
+3. import
+
+這個import，一般用於團隊開發使用，他可以將多個配置文件(xml)，導入合併為一個xml(applicationContext.xml)
+```xml
+<import resource="bean.xml">
+<import resource="bean2.xml">
+<import resource="bean3.xml">
 ```
 

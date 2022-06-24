@@ -25,5 +25,9 @@
 	<constructor-arg type="java.lang.String" value="許誌展">
 	</constructor-arg>
 	</bean>
+	
+	<bean id="user" class="User.User">
+	<constructor-arg name="name" value="許誌展"/>
+	</bean>
 
 </beans>
