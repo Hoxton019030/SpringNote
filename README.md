@@ -461,4 +461,4 @@ public class MyTest {
 <import resource="bean2.xml">
 <import resource="bean3.xml">
 ```
-
+# DI依賴注入(Dependency Injection)
