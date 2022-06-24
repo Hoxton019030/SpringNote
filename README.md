@@ -226,10 +226,17 @@ public void setUserDao(UserDao userDao){
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
+
 	<bean id="hello123" class="helloSpring.Hello">
-   <!-- class放檔案路徑 -->
-		<property name="str" value="Spring"></property>
-      <!-- 裡面有個名為str的屬性，他的值是Spring -->
+   <!-- 
+   資料型態 變數名稱 =  new 資料型態();
+   id = 變數名稱
+   class= new 的對象
+   property 相當於給對象中的屬性設置一個值
+   bean = 物件 new Hello(); 
+   -->
+	<property name="str" value="Spring"></property>
+   <!-- 裡面有個名為str的屬性，他的值是Spring -->
 	</bean>
 </beans>
 ```
@@ -247,6 +254,36 @@ public class Mytest {
       //印出Spring，因為在bean裡面說他的value是Spring
 	}
 }
+```
+
+## 配置Service至Spring
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+	<bean id="hello123" class="helloSpring.Hello">
+	<property name="str" value="Spring"></property>
+   </bean>
+
+   <bean id="mysqlImpl" class="helloSpring.UsermysqlImpl">
+   <!-- id=Bean的自訂義名字 Class=檔案路徑 -->
+   </bean>
+
+   <bean id="UserServiceImpl" class="helloSpring.UserServiceImpl">
+         <property name="userDao" ref="mySQLImpl"/>
+         <!-- 將UserServiceImpl裡面的userDao物件，讓它參考到mysqlImpl的Bean -->
+   </bean>
+   
+</beans>
 ```
 
 
