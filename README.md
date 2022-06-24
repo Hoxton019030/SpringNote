@@ -226,11 +226,27 @@ public void setUserDao(UserDao userDao){
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
-	<bean id="hello" class="helloSpring.Hello">
+	<bean id="hello123" class="helloSpring.Hello">
+   <!-- class放檔案路徑 -->
 		<property name="str" value="Spring"></property>
+      <!-- 裡面有個名為str的屬性，他的值是Spring -->
 	</bean>
-
 </beans>
+```
+>使用ClassPathXmlApplicationContext去調用bean，須注意，xml黨必須放在src/main/resources底下才會被讀到
+```java
+public class Mytest {
+	public static void main(String[] args) {
+		//獲取Spring上下文對象
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+		//我們的對象現在都在Spring裡面管理了，要使用的話，直接去裡面取用就好
+		Hello hello = (Hello) context.getBean("hello123");
+      //取得名為hello123的bean
+		String string = hello.toString();
+		System.out.println(string);
+      //印出Spring，因為在bean裡面說他的value是Spring
+	}
+}
 ```
 
 

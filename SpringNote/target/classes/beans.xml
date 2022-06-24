@@ -8,7 +8,7 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
-	<bean id="hello" class="Entity.Hello">
+	<bean id="hello123" class="Entity.Hello">
 		<property name="str" value="Spring"></property>
 	</bean>
 
