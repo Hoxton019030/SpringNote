@@ -201,6 +201,38 @@ public void setUserDao(UserDao userDao){
 + 使用set注入後，程序不在具有主動性，而是變成了被動的接受對象
 
 
+# 開始使用Spring
+
+> 引入Maven依賴，這裡面包含七大組件
+
+```
+ <!-- https://mvnrepository.com/artifact/org.springframework/spring-webmvc -->
+ <dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-webmvc</artifactId>
+    <version>5.2.0.RELEASE</version>
+ </dependency>
+```
+> 配置beans.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<bean id="hello" class="helloSpring.Hello">
+		<property name="str" value="Spring"></property>
+	</bean>
+
+</beans>
+```
+
 
 
 
