@@ -8,9 +8,8 @@ public class MyTest {
 		ApplicationContext context = new ClassPathXmlApplicationContext("student.xml");
 		Student student = (Student) context.getBean("student");
 		System.out.println(student.getName());
-		
-		
-		
-		
+
+
+
 	}
 }

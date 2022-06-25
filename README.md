@@ -483,6 +483,7 @@ public class MyTest {
    + **注入:bean物件中的所有屬性，由容器來注入**
 
 範例:
+> 複雜類型
 ```java
 public class Address {
 	
@@ -499,6 +500,7 @@ public class Address {
 
 }
 ```
+> 真實測試對象
 ```java
 public class Student {
 	private String name;
@@ -560,4 +562,35 @@ public class Student {
 
 }
 ```
+> xml配置
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
+	<bean id="student" class="Student.Student">
+   <!-- 1.String的注入 -->
+	<property name="name" value="Hoxton"></property>
+   
+	<property name="card" value="Hoxton"></property>
+	</bean>
+
+</beans>
+```
+> 測試類
+
+```java
+public class MyTest {
+	public static void main(String[] args) {
+		ApplicationContext context = new ClassPathXmlApplicationContext("student.xml");
+		Student student = (Student) context.getBean("student");
+		System.out.println(student.getName());
+	}
+}
+```
