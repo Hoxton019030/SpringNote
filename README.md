@@ -462,3 +462,102 @@ public class MyTest {
 <import resource="bean3.xml">
 ```
 # DI依賴注入(Dependency Injection)
+
+1. 建構子注入(上面寫的那些)
+```xml
+	<bean id="UserConstructor" class="User.User">
+	<constructor-arg index="0" value="許誌展">
+	</constructor-arg>
+	</bean>
+```
+  ```xml
+	<bean id="User" class="User.User" name="userNew" >
+	<constructor-arg index="0" value="許誌展">
+	</constructor-arg>
+	</bean>
+   ```
+
+2. Set方式注入**最重要**
++ 依賴注入:Set注入
+   + **依賴:bean物件的創建依賴於容器**
+   + **注入:bean物件中的所有屬性，由容器來注入**
+
+範例:
+```java
+public class Address {
+	
+	private String address;
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	
+
+}
+```
+```java
+public class Student {
+	private String name;
+	private Address address;
+	private String[] books;
+	private List<String> hobbys;
+	private Map<String,String> card;
+	private Set<String> games;
+	private String wife;
+	private Properties info;
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public Address getAddress() {
+		return address;
+	}
+	public void setAddress(Address address) {
+		this.address = address;
+	}
+	public String[] getBooks() {
+		return books;
+	}
+	public void setBooks(String[] books) {
+		this.books = books;
+	}
+	public List<String> getHobbys() {
+		return hobbys;
+	}
+	public void setHobbys(List<String> hobbys) {
+		this.hobbys = hobbys;
+	}
+	public Map<String, String> getCard() {
+		return card;
+	}
+	public void setCard(Map<String, String> card) {
+		this.card = card;
+	}
+	public Set<String> getGames() {
+		return games;
+	}
+	public void setGames(Set<String> games) {
+		this.games = games;
+	}
+	public String getWife() {
+		return wife;
+	}
+	public void setWife(String wife) {
+		this.wife = wife;
+	}
+	public Properties getInfo() {
+		return info;
+	}
+	public void setInfo(Properties info) {
+		this.info = info;
+	}
+
+}
+```
+
