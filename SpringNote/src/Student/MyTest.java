@@ -16,12 +16,13 @@ public class MyTest {
 		List<String> hobbys = student.getHobbys();
 		Map<String, String> card = student.getCard();
 		Set<String> games = student.getGames();
-		System.out.println(student.getWife());
+//		System.out.println(student.getWife());
 		for (String string : games) {
 			System.out.println(string);
 		}
 		String string2 = card.get("身分證");
 		System.out.println(string2);
+		
 		
 		
 		
@@ -31,6 +32,8 @@ public class MyTest {
 		for (String string : hobbys) {
 			System.out.println(string);
 		}
+		
+		ApplicationContext context2 = new ClassPathXmlApplicationContext("autowired.xml");
 
 	}
 }

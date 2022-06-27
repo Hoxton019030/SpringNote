@@ -6,4 +6,5 @@
         https://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean id="user" class="Student.User" p:name="Hoxton" p:age="22"></bean>
+    
 </beans>

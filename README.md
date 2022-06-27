@@ -786,3 +786,168 @@ public class LazyMan {
 3. **隱式的自動裝配bean**(最重要)
 
 
+### 自動裝配的概念
+
+1. byName :
+autowired byname 會自動在容器上下文中查找，和自己物件set方法後面的質對應的bean id，故beanid不能亂改
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="cat" class="autowired.pojo.Cat"></bean>
+	<bean id="dog" class="autowired.pojo.Dog"></bean>
+	<!-- autowired byname 會自動在容器上下文中查找，和自己物件set方法後面的質對應的bean id -->
+	<bean id="people" class="autowired.pojo.People" autowire="byName">
+		<property name="name" value="Hoxton"></property>
+	</bean>
+
+</beans>
+```
+2. byType:
+從容器的上下文中查找，和自己物件類型相同的的bean!，此方法只能用在創建一個實例對象，若重複的話類型也會重複，會出現衝突。
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="cat123" class="autowired.pojo.Cat"></bean>
+	<bean id="dog123" class="autowired.pojo.Dog"></bean>
+	<!-- 從容器的上下文中查找，和自己物件類型相同的的bean! -->
+	<bean id="people" class="autowired.pojo.People" autowire="byType">
+		<property name="name" value="Hoxton"></property>
+	</bean>
+</beans>
+```
+
+
+### 小結
++ byName時，需要保證所有bean的id唯一，並且這個bean需要和自動注入的屬性的set方法的值一致
++ byType時，需要保證所有bean的class唯一，並且這個bean需要和自動注入的屬性的類型一致
+
+
+
+# 使用Annotaion(@Autowired)自動裝配
+
+是先透過byType的方式注入，若有重複類型的bean，則再使用byName方法注入。直接在屬性上使用即可，要用在set方法上也是可啦，但不推
+
+
+#### 豆知識
+1. 若xml裡面配置了重複類型的bean，例如
+```xml
+  <bean id="cat1" class="autowired.pojo.Cat" />
+  <bean id="cat2" class="autowired.pojo.Cat" />
+	<bean id="dog1" class="autowired.pojo.Dog" />
+	<bean id="dog2 class="autowired.pojo.Dog" />
+	<bean id="people" class="autowired.pojo.People" />
+```
+若直接使用@Autowired
+```java
+@Autowired
+	private Cat cat;
+```
+則Spring會不知道我們要找的是哪一個，因此要使用@Qualifier(限定詞)來標註到底具體要使用哪一個beanid
+```java
+@Autowired
+@Qualifier(value="cat1")
+	private Cat cat;
+```
+
+
+要使用註解須知:
+1. 導入約束。　`context約束`
+2. 配置註解的支持 `<context:annotation-config/>`
+  ```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config/>
+
+</beans>
+  ```
+
+範例:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans
+      https://www.springframework.org/schema/beans/spring-beans.xsd
+      http://www.springframework.org/schema/context
+      https://www.springframework.org/schema/context/spring-context.xsd">
+
+  <context:annotation-config/>
+  
+  <bean id="cat" class="autowired.pojo.Cat" />
+	<bean id="dog" class="autowired.pojo.Dog" />
+	<bean id="people" class="autowired.pojo.People" />
+
+</beans>
+```
+```java
+package autowired.pojo;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+public class People {
+
+	@Autowired
+	private Cat cat;
+	@Autowired
+	private Dog dog;
+	private String name;
+
+	public People(Cat cat, Dog dog, String name) {
+		this.cat = cat;
+		this.dog = dog;
+		this.name = name;
+	}
+	
+
+	public People() {
+	}
+
+
+	@Override
+	public String toString() {
+		return "People [cat=" + cat + ", dog=" + dog + ", name=" + name + "]";
+	}
+
+	public Cat getCat() {
+		return cat;
+	}
+
+	public void setCat(Cat cat) {
+		this.cat = cat;
+	}
+
+	public Dog getDog() {
+		return dog;
+	}
+
+	public void setDog(Dog dog) {
+		this.dog = dog;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+}
+```
