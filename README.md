@@ -1,6 +1,8 @@
 
 # Spring
 
+官方文件 : https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-basics
+
 >一開始是由EJB(Enterprise JavaBean)演化而來，用來解決企業開發的複雜性
 
 
@@ -477,7 +479,7 @@ public class MyTest {
 	</bean>
    ```
 
-2. Set方式注入**最重要**
+2. Set方式注入(**最重要**)
 + 依賴注入:Set注入
    + **依賴:bean物件的創建依賴於容器**
    + **注入:bean物件中的所有屬性，由容器來注入**
@@ -573,13 +575,14 @@ public class Student {
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
-    <bean id="address" class="Student.Address"></bean>
+	<bean id="address" class="Student.Address"></bean>
+
 	<bean id="student" class="Student.Student">
-    <!-- 1.String的注入 -->
-	<property name="name" value="Hoxton"></property>
-	<!-- 2.bean注入 對應上面的bean id="address"-->
-	<property name="address" ref="address"></property>
-	<!-- 3.Array注入 -->
+		<!-- 1.普通值注入 -->
+		<property name="name" value="Hoxton"></property>
+		<!-- 2.bean注入 -->
+		<property name="address" ref="address"></property>
+		<!-- 3.Array注入 -->
 		<property name="books">
 			<array>
 				<value>The lord of rings</value>
@@ -622,7 +625,6 @@ public class Student {
 				<prop key="username">小明</prop>
 			</props>
 		</property>
-
 	</bean>
 
 </beans>
@@ -638,3 +640,149 @@ public class MyTest {
 	}
 }
 ```
+
+# P命名空間(Set注入property)與C(建構子注入constructor)命名空間,不實用知道就好
+
+
+> Java bean
+```java
+package User;
+
+public class User {
+
+	private String name;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public User() {
+		System.out.println("User的無參建構子");
+	}
+	public User(String name) {
+		System.out.println("User的有參建構子");
+		System.out.println("name"+name);
+	}
+
+
+	public void show() {
+		System.out.println("name" + name);
+	}
+//建構子注入，所以需要有參建構子
+	public User(String name, int age) {
+		super();
+		this.name = name;
+		this.age = age;
+	}
+}
+
+```
+> xml 配置
+```xml
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="user" class="Student.User" p:name="Hoxton" p:age="22"></bean>
+  <bean id="user2" class="Student.User" c:age="18" c:name="Hoxton"></bean>
+</beans>
+```
+
+
+# Bean的作用域
+
++ singleton(全局唯一，也是Spring的默認機制):
+  + 只有創建一個實例，不論後續有多少個Dao，始終用的都只有一個實例
+  + 在創建容器的時候就產生了
+  + 適合單線程 
+
++ prototype(每個物件獨立)
+  + 每次創建不同實例
+  + 在get方法的時候產生
+  + 相對來講比較浪費資源
+
+
++ request
++ session
++ application
++ websocket
+
+上面四個都是Web的東西，先擱著唄^_^
+
+
+# 單例設計模式是什麼?(額外補充)
++ 核心概念:建構子私有化，如此一來別的物件就不能創建它，保證記憶體中只有一個物件
++ 只會有一個實體物件
++ 該物件必須由單例類自行創造
++ 單例類對外提供「一個」對外的全域訪問點
+
+
+1. Hungry(餓漢式)
+```java
+package singleton;
+
+public class Hungry {
+
+	private byte[] data1 = new byte[1024 * 1024];
+	private byte[] data2 = new byte[1024 * 1024];
+	private byte[] data3 = new byte[1024 * 1024];
+	private byte[] data4 = new byte[1024 * 1024];
+
+	// 1.建構子私有化，外部無法創建該對象
+	private Hungry() {
+	}
+
+	// 2.自己創建對象，變數被final修飾後，不能再指向其他對象，但指向對象的內容是可以被改變的
+	private final static Hungry HUNGRY = new Hungry();
+
+    // 3.提供對應的獲取方法
+	public static Hungry getInstance() {
+		return HUNGRY;
+	}
+}
+```
+
+2. LazyMan(懶漢式)
+```java
+public class LazyMan {
+
+	private byte[] data1 = new byte[1024 * 1024];
+	private byte[] data2 = new byte[1024 * 1024];
+	private byte[] data3 = new byte[1024 * 1024];
+	private byte[] data4 = new byte[1024 * 1024];
+
+    //1.建構子私有化
+	private LazyMan() {
+	}
+
+	//2.創建LazyMan的變量，但沒有具體引用，這就是差異，為了避免資源的浪費，只要這個類沒有被使用，則不創建，待調用方法時才創建，
+	private static LazyMan LazyMan;
+
+	public static LazyMan getInstance() {
+		if(LazyMan==null) {
+			LazyMan=new LazyMan();
+		}
+		return LazyMan;
+	}
+
+}
+```
+
+
+# Bean的自動裝配
++ 撰寫xml就是手動裝配
++ 自動裝配是Spring滿足bean依賴的一種方式
++ Spring會在上下文忠自動尋找，並自動給bean裝配屬性
+
+在Spring中有三種裝配的方式
+1. 在xml中顯示的配置
+2. 在java中顯示配置
+3. **隱式的自動裝配bean**(最重要)
+
+
