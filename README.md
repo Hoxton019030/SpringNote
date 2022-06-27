@@ -837,6 +837,53 @@ autowired byname 會自動在容器上下文中查找，和自己物件set方法
 是先透過byType的方式注入，若有重複類型的bean，則再使用byName方法注入。直接在屬性上使用即可，要用在set方法上也是可啦，但不推
 
 
+### 常用註解
+
+1. @Autowired :自動裝配 優先順序1.byType 2.byName
+
+2. @Nullable  :字段標記了這個註解，說明這個字段可以為Null
+
+3. @Resource  :自動裝配 ByName
+
+4. @Component :組件的意思，寫在Class上方，說明這個類被Spring控管，也就是Bean
+	他本身有幾個衍生的註解，**功能和@Component完全一樣**，只是依照MVC架構命名，分別是
+	+ dao 【@Repository】 :用來寫在Dao上
+	+ Service【@Service】 :寫在Service層
+	+ Controller【@Controller】 :寫在Controller上
+
+	
+  ```xml
+ <?xml version="1.0" encoding="UTF-8"?>
+ <beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+		<!-- 使用這個標籤來掃描 annotaion這個package底下的所有Class 
+		package底下的Class就會被自動註冊至Spring容器裡面，成為bean-->
+	    <context:component-scan
+		base-package="annotation"></context:component-scan>
+</beans>
+  ```
+  ```java
+  package annotation;
+
+ import org.springframework.stereotype.Component;
+
+ //等價於在xml裡註冊了<bean id="user" class="annotation.User"/>
+ //@Component組件
+ @Component
+ public class User {
+	public String name ="Hoxton123";
+}
+```
+
+
+---
+
 #### 豆知識
 1. 若xml裡面配置了重複類型的bean，例如
 ```xml
@@ -858,24 +905,12 @@ autowired byname 會自動在容器上下文中查找，和自己物件set方法
 	private Cat cat;
 ```
 
+ ---
 
 要使用註解須知:
 1. 導入約束。　`context約束`
 2. 配置註解的支持 `<context:annotation-config/>`
-  ```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:context="http://www.springframework.org/schema/context"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans
-        https://www.springframework.org/schema/beans/spring-beans.xsd
-        http://www.springframework.org/schema/context
-        https://www.springframework.org/schema/context/spring-context.xsd">
 
-    <context:annotation-config/>
-
-</beans>
-  ```
 
 範例:
 ```xml
@@ -951,3 +986,75 @@ public class People {
 
 }
 ```
+
+### 小結(XML爽別人，註解爽自己)
++ xml
+	+ xml更萬能，適用於任何場合，維護簡單方便
+	+ 
++ 註解
+	+ 不是自己的類使用不了，維護相對複雜
+
+# 使用Java的方式配置Spring(完全不使用xml)
+
+JavaConfig是Spring的一個子項目，在Spring4後，成為了一個核心的功能，調用時是用`AnnotationConfigApplicationContext`
+
+1. 一樣撰寫pojo
+```java
+public class User {
+	private String name;
+
+	public User() {
+	}
+	public String getName() {
+		return name;
+	}
+	
+	@Value("Hoxton123")
+	//將name附值為Hoxton123
+	public void setName(String name) {
+		this.name = name;
+	}
+}
+```
+2. 撰寫config類
+```java
+package javaConfig;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+//相當於xml裡面的beans，也會將這個類交由Spring託管，註冊到容器中，因為他本身也是一個@Component
+//@Configuraion本身就是一個配置類，就和我們之前看bean.xml是一樣的
+public class JavaConfig {
+
+	@Bean
+//	相當於在xml裡面配置
+//	<bean id="getUSer" ref="User">
+	public User getUser() {
+		return new User(); //返回要注入到bean的物件
+	}
+}
+
+```
+3. 撰寫測試類
+```java
+package javaConfig;
+
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+public class Mytest {
+	public static void main(String[] args) {
+		//如果完全使用了配置類方法去做，我們就只能通過AnnotationConfig 上下文來獲取容器，通過配置類的class物件加載。
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(JavaConfig.class);
+		User user = (User) context.getBean("getUser");
+		String name = user.getName();
+		System.out.println(name);
+		//印出Hoxton123
+	}
+
+}
+
+```
+
+	
