@@ -573,12 +573,56 @@ public class Student {
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
-
+    <bean id="address" class="Student.Address"></bean>
 	<bean id="student" class="Student.Student">
-   <!-- 1.String的注入 -->
+    <!-- 1.String的注入 -->
 	<property name="name" value="Hoxton"></property>
-   
-	<property name="card" value="Hoxton"></property>
+	<!-- 2.bean注入 對應上面的bean id="address"-->
+	<property name="address" ref="address"></property>
+	<!-- 3.Array注入 -->
+		<property name="books">
+			<array>
+				<value>The lord of rings</value>
+				<value>Mistborn</value>
+				<value>Hally Porter</value>
+			</array>
+		</property>
+		<!-- 4.List注入 -->
+		<property name="hobbys">
+			<list>
+				<value>listen Music</value>
+				<value>coding</value>
+				<value>Watch Movie</value>
+			</list>
+		</property>
+		<!-- 5.Map注入 -->
+		<property name="card">
+			<map>
+				<entry key="身分證" value="S123456789"></entry>
+				<entry key="信用卡" value="1234-5678-9"></entry>
+			</map>
+		</property>
+		<!-- 6. Set注入 -->
+		<property name="games">
+			<set>
+				<value>LOL</value>
+				<value>Apex</value>
+				<value>Dota2</value>
+			</set>
+		</property>
+		<!-- 7.設置為null -->
+		<property name="wife">
+			<null></null>
+		</property>
+		<!-- 8.Property注入 -->
+		<property name="info">
+			<props>
+				<prop key="driver">20190525</prop>
+				<prop key="url">男</prop>
+				<prop key="username">小明</prop>
+			</props>
+		</property>
+
 	</bean>
 
 </beans>
