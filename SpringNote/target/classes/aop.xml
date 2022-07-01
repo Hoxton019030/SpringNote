@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!-- 註冊bean Start -->
+	<bean id="userServiceImpl" class="aop.UserServiceImpl"></bean>
+	<bean id="log" class="aop.Log"></bean>
+	<bean id="afterLog" class="aop.AfterLog"></bean>
+	<!-- 註冊bean End -->
+
+	<!-- 方式一:使用原生Spring API接口 -->
+	<!-- 配置aop Start -->
+	<aop:config>
+		<!-- 切入點:pointcut, expression:表達式 execution(要執行的位置! *(存取範圍修飾子) *(返回值)*(類名)*(方法名)*(參數)) -->
+		<aop:pointcut id="pointcut"
+			expression="execution(* aop.UserServiceImpl.*(..))" />
+		<!-- 執行環繞 -->
+		<aop:advisor advice-ref="log" pointcut-ref="pointcut" />
+		<aop:advisor advice-ref="afterLog" pointcut-ref="pointcut" />
+<!-- 		把log這個Class橫向切入UserServiceImpl這個Class裡面的方法中 -->
+	</aop:config>
+	<!-- 配置aop End -->
+
+
+</beans>

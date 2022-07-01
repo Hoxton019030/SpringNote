@@ -1057,4 +1057,196 @@ public class Mytest {
 
 ```
 
+
+如此一來就不需要配置任何xml檔
+
+
+
+---
+
+# 了解AOP之代理模式
+
+## 靜態代理
++ 抽象角色: 逼班會使用介面或抽象類來解決
++ 真實角色: 被代理的角色
++ 代理角色: 代理真實角色，代理真實角色後，我們一班會做一些附屬操作
++ 客戶: 訪問代理對象的人
+
+
+# 完全看不懂 代理模式先跳過 好難喔
+
+
+# AOP 剖面導向程式設計
+
+AOP是OOP的延續，是軟體開發中的一個熱門重點，也是Spring框架的一個重要內容，利用AOP可以對業務邏輯的各個部份進行隔離，從而使得業務邏輯各部分之間的耦合度降低，提高程式的可重用性，同時提高了開發效率。
+
+需導入的依賴
+```xml
+	<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+			<version>1.9.4</version>
+		</dependency>
+```
+
+在SpringAOP中透過Advice定義了剖面邏輯，Spring支援五種類型的Advice
+
+通知類型
+1. 前置通知 
+	+ 方法前
+		+ org.springframework.aop.MethodBeforeAdvice
+2. 後置通知
+	+ 方法後
+		+ org.springframework.aop.AfterReturningAdvice
+3. 環繞通知
+	+ 方法前後
+		+ org.springframework.aop.intercept.MethodInterceptor
+4. 異常拋出通知
+	+ 方法拋出異常
+		+ org.springframework.aop.ThrowsAdvice
+5. 引介通知
+	+ 類中增加新的方法屬性
+		+ org.springframework.aop.IntroductionInterceptor
 	
+
+## 方法一:使用Spring的API介面
+
+使用<aop:config>的方式去設置
+
+```java
+package aop;
+
+public interface UserService {
+	public void add();
+	public void delete();
+	public void update();
+	public void select();
+
+}
+```
+```java
+package aop;
+
+public class UserServiceImpl implements UserService{
+
+	@Override
+	public void add() {
+		// TODO Auto-generated method stub
+		System.out.println("增加用戶");
+		
+	}
+
+	@Override
+	public void delete() {
+		// TODO Auto-generated method stub
+		System.out.println("刪除用戶");
+		
+	}
+
+	@Override
+	public void update() {
+		// TODO Auto-generated method stub
+		System.out.println("更新用戶");
+	}
+
+	@Override
+	public void select() {
+		// TODO Auto-generated method stub
+		System.out.println("查詢用戶");
+		
+	}
+
+}
+```
+```java
+package aop;
+
+import java.lang.reflect.Method;
+
+import org.springframework.aop.MethodBeforeAdvice;
+
+public class Log implements MethodBeforeAdvice{
+
+	@Override
+	//method:要執行的目標物件的方法
+	//arg:參數
+	//target :目標對象
+	public void before(Method method, Object[] args, Object target) throws Throwable {
+		// TODO Auto-generated method stub
+		System.out.println(target.getClass().getName()+"的"+method.getName()+"被執行了");
+		//getName(Class的名字)
+		
+		
+	}
+
+}
+```
+```java
+package aop;
+
+import java.lang.reflect.Method;
+
+import org.springframework.aop.AfterReturningAdvice;
+
+public class AfterLog implements AfterReturningAdvice{
+
+	@Override
+	// returnValue:返回值
+	public void afterReturning(Object returnValue, Method method, Object[] args, Object target) throws Throwable {
+		// TODO Auto-generated method stub
+		System.out.println("執行了"+method.getName()+"返回結果為:"+returnValue);
+		
+	}
+
+}
+```
+```java
+package aop;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class Mytest {
+	public static void main(String[] args) {
+		ApplicationContext context = new ClassPathXmlApplicationContext("aop.xml");
+		// 動態代理，代理的是介面
+		UserService userService = context.getBean("userServiceImpl", UserService.class);
+		userService.select();
+
+	}
+}
+```
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!-- 註冊bean Start -->
+	<bean id="userServiceImpl" class="aop.UserServiceImpl"></bean>
+	<bean id="log" class="aop.Log"></bean>
+	<bean id="afterLog" class="aop.AfterLog"></bean>
+	<!-- 註冊bean End -->
+
+	<!-- 方式一:使用原生Spring API接口 -->
+	<!-- 配置aop Start -->
+	<aop:config>
+		<!-- 切入點:pointcut, expression:表達式 execution(要執行的位置! *(存取範圍修飾子) *(返回值)*(類名)*(方法名)*(參數)) -->
+		<aop:pointcut id="pointcut"
+			expression="execution(* aop.UserServiceImpl.*(..))" />
+		<!-- 執行環繞 -->
+		<aop:advisor advice-ref="log" pointcut-ref="pointcut" />
+		<aop:advisor advice-ref="afterLog" pointcut-ref="pointcut" />
+<!-- 		把log這個Class橫向切入UserServiceImpl這個Class裡面的方法中 -->
+	</aop:config>
+	<!-- 配置aop End -->
+
+
+</beans>
+```
+## 方法一:自定義類來實現AOP
