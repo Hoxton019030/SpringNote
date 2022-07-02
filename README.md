@@ -1109,7 +1109,7 @@ AOP是OOP的延續，是軟體開發中的一個熱門重點，也是Spring框�
 		+ org.springframework.aop.IntroductionInterceptor
 	
 
-## 方法一:使用Spring的API介面
+## 方法一:使用Spring的API介面【主要SpringAPI介面實現】
 
 使用<aop:config>的方式去設置
 
@@ -1249,4 +1249,94 @@ public class Mytest {
 
 </beans>
 ```
-## 方法一:自定義類來實現AOP
+## 方法二:自定義類來實現AOP【主要是自定義切面類】
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!-- 註冊bean Start -->
+	<bean id="userServiceImpl" class="aop.UserServiceImpl"></bean>
+	<bean id="log" class="aop.Log"></bean>
+	<bean id="afterLog" class="aop.AfterLog"></bean>
+	<!-- 註冊bean End -->
+
+	<!-- 方式二 自定義類別 -->
+	<bean id="diy" class="aop.DiyPointCut"></bean>
+	<aop:config>
+		<!-- 自定義切面，把類定義成切面，ref:要印用的類id -->
+		<aop:aspect ref="diy">
+			<!-- Start切入點 -->
+			<aop:pointcut
+				expression="execution(* aop.UserServiceImpl.*(..))" id="point" />
+			<!-- End切入點 -->
+			<aop:before method="before" pointcut-ref="point" />
+			<aop:after method="after" pointcut-ref="point" />
+		</aop:aspect>
+	</aop:config>
+
+</beans>
+```
+
+## 方式三:使用註解來實現
+
+再類上使用@Aspect，將整個類轉化為一個切面，接著再在方法上面寫上
++ @Before
++ @After
++ @Around
+將整個方法切入進想增加的業務邏輯裡，`"execution(* aop.UserServiceImpl.*(..))"`，其中的execution是固定寫法。
+```java
+	package aop;
+
+	import org.aspectj.lang.ProceedingJoinPoint;
+	import org.aspectj.lang.Signature;
+	import org.aspectj.lang.annotation.After;
+	import org.aspectj.lang.annotation.Around;
+	import org.aspectj.lang.annotation.Aspect;
+	import org.aspectj.lang.annotation.Before;
+
+	@Aspect
+	public class AnnotationPointCut {
+
+		@Before("execution(* aop.UserServiceImpl.*(..))")
+		public void before() {
+			System.out.println("====方法執行前");
+		}
+		@After("execution(* aop.UserServiceImpl.*(..))")
+		public void after() {
+			System.out.println("====方法執行後");
+		}
+		
+		//在環繞增強中，我們可以給定一個參數，代表我們要獲取處理切入的點
+		@Around("execution(* aop.UserServiceImpl.*(..))")
+		public void around(ProceedingJoinPoint jp) throws Throwable {
+			System.out.println("環繞前");
+			Signature signature = jp.getSignature(); //獲得類的資訊 signature:void aop.UserService.select()
+			System.out.println("signature:"+signature);
+			//執行方法，相當於invoke
+			Object proceed = jp.proceed();
+			System.out.println("環繞後");
+			System.out.println(proceed);
+		}
+
+	}
+
+```
+
+
+# 聲明式事務(transaction)
+1. 回顧事務(ACID)
+	+ 原子性(Atomicity)：要嘛全部執行，要嘛都不執行，沒有執行一半的，若出錯則全部回滾(Roll Back)至執行前狀態。
+
+	+ 一致性(Consistency):事務成功後，資料庫所處的狀態和它的業務規則是一致的，即資料不會被破壞，舉例來說，A帳戶轉帳100到B帳戶，不論操作成功與否，A和B的帳戶存款總額都不會改變。
+
+	+ 隔離性(Isolation):在多執行序的情況下，不同的事務有各自的資料空間，它們的操作不會影響到彼此進而產生干擾。
+
+	+ 持久性(Durability):一旦事務提交成功後，事務中所有的資料操作都必須被持久化保存到資料庫中，即使在事物提交後，資料庫馬上崩潰，在資料庫重啟時，也必須保證能夠通過某種機制恢復資料。
